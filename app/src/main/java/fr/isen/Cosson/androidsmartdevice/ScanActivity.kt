@@ -49,8 +49,8 @@ class ScanActivity : AppCompatActivity() {
             togglePlayPauseAction()
         }
 
-        binding.scanList2.layoutManager = LinearLayoutManager(this)
-        binding.scanList2.adapter = ScanAdapter(arrayListOf("Device 1", "Device 2"))
+        binding.scanList.layoutManager = LinearLayoutManager(this)
+        binding.scanList.adapter = ScanAdapter(arrayListOf("Device 1", "Device 2"))
 
 
         binding.start2.setOnClickListener {

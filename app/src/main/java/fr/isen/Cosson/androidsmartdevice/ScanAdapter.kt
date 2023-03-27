@@ -2,6 +2,7 @@ package fr.isen.Cosson.androidsmartdevice
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import fr.isen.Cosson.androidsmartdevice.databinding.ScanCellBinding
 
@@ -18,7 +19,7 @@ class ScanAdapter (var devices: ArrayList<String>) : RecyclerView.Adapter<ScanAd
         holder.deviceName.text = devices[position]
     }
     class ScanViewHolder(binding: ScanCellBinding): RecyclerView.ViewHolder(binding.root){
-        val deviceName = binding.deviceName
+        val deviceName : TextView = binding.ble
     }
 }
 

@@ -41,6 +41,7 @@
         app:srcCompat="@drawable/start" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/scanList"
         android:layout_width="409dp"
         android:layout_height="551dp"
         android:layout_marginStart="1dp"

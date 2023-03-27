@@ -57,26 +57,22 @@ class ScanActivity : AppCompatActivity() {
             handleBLENotAvailable()
             Toast.makeText(this,"bluetooth pas activer", Toast.LENGTH_LONG).show()
         }
-/*
+
         binding.instructionToStart.setOnClickListener {
             togglePlayPauseAction()
         }
-*/
+
 
         binding.start2.setOnClickListener {
             togglePlayPauseAction()
-        }
-
-        binding.scanList.layoutManager = LinearLayoutManager(this)
-        binding.scanList.adapter = ScanAdapter(arrayListOf("Device 1", "Device 2"))
-
-
-        binding.start2.setOnClickListener {
             val progressBar = findViewById<ProgressBar>(R.id.loading)
 
             progressBar.setIndeterminate(true)
-
         }
+
+        binding.scanList.layoutManager = LinearLayoutManager(this)
+        binding.scanList.adapter = ScanAdapter(arrayListOf("Device 1", "Device 2", "Device 3", "Device 4", "Device 5"))
+
 
        // binding.instructionToStart.layoutManage = LinearLayoutManager(this)
        // binding.instructionToStart.layoutAdapter = LinearLayoutManager(this)

@@ -6,13 +6,18 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings.Global.getString
 import android.view.animation.LinearInterpolator
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import fr.isen.Cosson.androidsmartdevice.databinding.ActivityMainBinding
@@ -23,11 +28,19 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var binding: ActivityScanBinding
 
     private val bluetoothAdapter: BluetoothAdapter? by
-    lazy(LazyThreadSafetyMode.NONE){
+    lazy(LazyThreadSafetyMode.NONE) {
         val bluetoothManager =
             getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }
+
+    val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
+        { permissions ->
+            if (permissions.all { it.value }) {
+                scanBLEDevices()
+            }
+        }
 
     private var mScanning = false
 
@@ -44,10 +57,12 @@ class ScanActivity : AppCompatActivity() {
             handleBLENotAvailable()
             Toast.makeText(this,"bluetooth pas activer", Toast.LENGTH_LONG).show()
         }
-
+/*
         binding.instructionToStart.setOnClickListener {
             togglePlayPauseAction()
         }
+*/
+
         binding.start2.setOnClickListener {
             togglePlayPauseAction()
         }
@@ -85,35 +100,44 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun initToggleActions() {
-        TODO("Not yet implemented")
+        //
     }
 
     private fun allPermissionGranted(): Boolean {
         val allPermissions = getAllPermission()
         return allPermissions.all {
-            // à remplacer par la vérification de chaque permission
-            true
+            ContextCompat.checkSelfPermission( this, it) == PackageManager.PERMISSION_GRANTED
         }
     }
 
     private fun getAllPermission(): Array<String> {
-    return arrayOf(android.Manifest.permission.BLUETOOTH_ADMIN)
+    return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+        arrayOf(
+            android.Manifest.permission.BLUETOOTH_SCAN,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.BLUETOOTH_CONNECT,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+         else{
+            arrayOf(
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION)
+         }
     }
 
     private fun togglePlayPauseAction(){
         mScanning = !mScanning
         if(mScanning){
-            binding.instructionToStart.text = getString(R.string.ble_scan_title_pause)
+            binding.instructionToStart.text = getString(R.string.ble_scan_title_play)
             binding.start2.setImageResource(R.drawable.pause)
             binding.loading.isVisible = true
         } else {
-            binding.instructionToStart.text = getString(R.string.ble_scan_title_play)
+            binding.instructionToStart.text = getString(R.string.ble_scan_title_pause)
             binding.start2.setImageResource(R.drawable.start)
             binding.loading.isVisible = false
         }
 
     }
-
 
 }
 

@@ -1,9 +1,12 @@
 package fr.isen.Cosson.androidsmartdevice
 
+import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +20,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,6 +37,17 @@ class ScanActivity : AppCompatActivity() {
             getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }
+///////
+    val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
+    val scanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            // Traitement des résultats de scan ici
+        }
+    }
+///////
+
+    private val REQUEST_PERMISSIONS_CODE = 1234
+
 
     val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
@@ -71,7 +86,8 @@ class ScanActivity : AppCompatActivity() {
         }
 
         binding.scanList.layoutManager = LinearLayoutManager(this)
-        binding.scanList.adapter = ScanAdapter(arrayListOf("Device 1", "Device 2", "Device 3", "Device 4", "Device 5"))
+        binding.scanList.adapter = ScanAdapter(arrayListOf("Device 1", "Device 2", "Device 3",
+            "Device 4", "Device 5"))
 
 
        // binding.instructionToStart.layoutManage = LinearLayoutManager(this)
@@ -87,7 +103,16 @@ class ScanActivity : AppCompatActivity() {
         if(allPermissionGranted()){
             scanBLEDevices()
         }else {
-            //request toutes les permissions
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                REQUEST_PERMISSIONS_CODE
+            )
         }
     }
 
@@ -96,8 +121,16 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun initToggleActions() {
-        //
+        binding.instructionToStart.setOnClickListener {
+            togglePlayPauseAction()
+        }
+
+        binding.start2.setOnClickListener {
+            togglePlayPauseAction()
+        }
     }
+
+
 
     private fun allPermissionGranted(): Boolean {
         val allPermissions = getAllPermission()

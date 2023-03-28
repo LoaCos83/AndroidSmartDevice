@@ -36,16 +36,18 @@ class DeviceActivity : AppCompatActivity() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             if(newState == BluetoothProfile.STATE_CONNECTED) {
                 runOnUiThread{
-                    displayContentConnected()
+                    //displayContentConnected()
                 }
             }
         }
     }
-
+/*
     private fun displayContentConnected(){
         //avec tes variables
         binding.TPBLE.text = getString(R.string.device_led_text)
         binding.chargement.isVisible = false
         binding.led1.isVisible = true
     }
+
+ */
 }

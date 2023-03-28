@@ -18,6 +18,7 @@ class ScanAdapter (var devices: ArrayList<BluetoothDevice>, var onDeviceClickLis
     override fun getItemCount(): Int = devices.size
 
     override fun onBindViewHolder(holder: ScanViewHolder, position: Int) {
+        //holder.deviceAddress.text = devices[position].address
         holder.deviceName.text = devices[position].address
         holder.itemView.setOnClickListener { onDeviceClickListener(devices[position]) }
     }

@@ -20,6 +20,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings.Global.getString
 import android.util.Log
+import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -74,21 +75,6 @@ class ScanActivity : AppCompatActivity() {
             handleBLENotAvailable()
             Toast.makeText(this,"bluetooth pas activer", Toast.LENGTH_LONG).show()
         }
-
-        binding.instructionToStart.setOnClickListener {
-            togglePlayPauseAction()
-        }
-
-        binding.start2.setOnClickListener {
-            togglePlayPauseAction()
-            val progressBar = findViewById<ProgressBar>(R.id.loading)
-
-            progressBar.setIndeterminate(true)
-        }
-
-
-       // binding.instructionToStart.layoutManage = LinearLayoutManager(this)
-       // binding.instructionToStart.layoutAdapter = LinearLayoutManager(this)
 
     }
 

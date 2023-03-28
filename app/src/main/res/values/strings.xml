@@ -2,4 +2,5 @@
     <string name="app_name">AndroidSmartDevice</string>
     <string name="ble_scan_title_pause">Lancer le scan</string>
     <string name="ble_scan_title_play">Scan en cours...</string>
+    <string name="device_led_text">Connection en cours...</string>
 </resources>

@@ -12,12 +12,16 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import fr.isen.Cosson.androidsmartdevice.databinding.ActivityDeviceBinding
 import fr.isen.Cosson.androidsmartdevice.databinding.ActivityScanBinding
+import java.util.*
 
 class DeviceActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDeviceBinding
     private var bluetoothGatt: BluetoothGatt? = null
-    private var cptClick=0
+    private val serviceUUID = UUID.fromString("0000feed-cc7a-482a-984a-7f2ed5b3e58f")
+    private val characteristicLedUUID = UUID.fromString("0000abcd-8e22-4541-9d4c-21edae82ed19")
+    private val characteristicButtonUUID = UUID.fromString("00001234-8e22-4541-9d4c-21edae82ed19")
+    private var cptClick = 0
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,11 +29,12 @@ class DeviceActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val bluetoothDevice: BluetoothDevice? = intent.getParcelableExtra("device")
-       // val bluetoothDevice: BluetoothDevice? =
-        val bluetoothGatt = bluetoothDevice?.connectGatt(this, false, bluetoothGattCallback)
-        bluetoothGatt?.connect()
+
+        bluetoothGatt = bluetoothDevice?.connectGatt(this, false, bluetoothGattCallback)
+       // bluetoothGatt?.connect()
 
         clickOnLed()
+        Recup()
     }
     @SuppressLint("MissingPermission")
     override fun onStop(){
@@ -37,48 +42,80 @@ class DeviceActivity : AppCompatActivity() {
         bluetoothGatt?.close()
     }
 
+    private fun Recup(){
+        val characteristicButton = bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicButtonUUID)
+        cptClick = characteristicButton?.value?.get(0)?.toInt() ?: 0
+        binding.cptClick.text = "Nombre de click : $cptClick"
+    }
+
+    @SuppressLint("MissingPermission")
     private fun clickOnLed(){
         binding.image1.setOnClickListener{
+
+            val characteristic = bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicLedUUID)
+
             if(binding.image1.imageTintList == getColorStateList(R.color.teal_200)){
                 binding.image1.imageTintList = getColorStateList(R.color.black)
+                characteristic?.value = byteArrayOf(0x00)
+                bluetoothGatt?.writeCharacteristic(characteristic)
             } else{
                 binding.image1.imageTintList = getColorStateList(R.color.teal_200)
-                cptClick ++
-                binding.cptClick.text="Nombre de click : $cptClick"
+                characteristic?.value = byteArrayOf(0x01)
+                bluetoothGatt?.writeCharacteristic(characteristic)
             }
         }
         binding.image2.setOnClickListener{
+            val characteristic = bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicLedUUID)
+
             if(binding.image2.imageTintList == getColorStateList(R.color.teal_200)){
                 binding.image2.imageTintList = getColorStateList(R.color.black)
+                characteristic?.value = byteArrayOf(0x00)
+                bluetoothGatt?.writeCharacteristic(characteristic)
             } else{
                 binding.image2.imageTintList = getColorStateList(R.color.teal_200)
-                cptClick ++
-                binding.cptClick.text="Nombre de click : $cptClick"
+                characteristic?.value = byteArrayOf(0x02)
+                bluetoothGatt?.writeCharacteristic(characteristic)
             }
         }
         binding.image3.setOnClickListener{
+            val characteristic = bluetoothGatt?.getService(serviceUUID)?.getCharacteristic(characteristicLedUUID)
+
             if(binding.image3.imageTintList == getColorStateList(R.color.teal_200)){
                 binding.image3.imageTintList = getColorStateList(R.color.black)
+                characteristic?.value = byteArrayOf(0x00)
+                bluetoothGatt?.writeCharacteristic(characteristic)
             } else{
                 binding.image3.imageTintList = getColorStateList(R.color.teal_200)
-                cptClick ++
-                binding.cptClick.text="Nombre de click : $cptClick"
+                characteristic?.value = byteArrayOf(0x03)
+                bluetoothGatt?.writeCharacteristic(characteristic)
             }
         }
     }
 
     private val bluetoothGattCallback = object: BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             if(newState == BluetoothProfile.STATE_CONNECTED) {
                 runOnUiThread{
                     displayContentConnected()
                 }
+                bluetoothGatt?.discoverServices()
             }
         }
+        override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
+            if (characteristic?.uuid == characteristicButtonUUID) {
+                val value = characteristic?.value?.get(0)?.toInt() ?: 0
+                // Mettre à jour le compteur de clics
+                cptClick += value
+                runOnUiThread {
+                    binding.cptClick.text = "Nombre de clics: $cptClick"
+                }
+            }
+        }
+
     }
 
     private fun displayContentConnected(){
-        //avec tes variables
         binding.tpble.text = "TPBLE"
         binding.textLed.text = "Affichage des LEDs"
         binding.abonneText.isVisible = true

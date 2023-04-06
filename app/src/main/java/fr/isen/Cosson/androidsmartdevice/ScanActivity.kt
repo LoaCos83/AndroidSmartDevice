@@ -99,6 +99,7 @@ class ScanActivity : AppCompatActivity() {
         adapter = ScanAdapter(arrayListOf()){
             val intent = Intent(this, DeviceActivity::class.java)
             intent.putExtra("device", it)
+            intent.putExtra("rssi", it)
             startActivity(intent)
         }
         binding.scanList.adapter = adapter
@@ -137,11 +138,14 @@ class ScanActivity : AppCompatActivity() {
 
     // Device scan callback.
     private val leScanCallback: ScanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
+        override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
-            Log.d("Scan","result: $result")
-            adapter.addDevice(result.device)
-            adapter.notifyDataSetChanged()
+            result?.let { scanResult ->
+                val device = scanResult.device
+                val rssi = scanResult.rssi
+                adapter.addDevice(device, rssi) // <-- passer le RSSI ici
+                adapter.notifyDataSetChanged()
+            }
         }
     }
 
